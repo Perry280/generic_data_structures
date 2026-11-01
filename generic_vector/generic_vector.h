@@ -142,9 +142,7 @@ size_t gvec_capacity(const gvec_t *vec);
 /**
  * @brief Gets a pointer to the element at a given index.
  *
- * @param vec
- * Pointer to the vector (the full struct definition must be
- * visible, i.e. this is meant for use inside the implementation).
+ * @param vec Pointer to the vector.
  * @param index Zero-based index of the element.
  *
  * @return `void *` pointing to the first byte of the element.
