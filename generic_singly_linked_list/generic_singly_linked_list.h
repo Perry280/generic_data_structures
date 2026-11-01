@@ -2,7 +2,6 @@
  * @headerfile singly_linked_list_int.h
  * @brief Singly linked list of `int`.
  *
- * All functions return `SGSLL_OK` on success or a negative error code.
  * The library is not thread-safe.
  */
 #ifndef GENERIC_SINGLY_LINKED_LIST_H
@@ -35,16 +34,7 @@ typedef struct gsll_node_s {
 typedef void (*gsll_foreach_f)(gsll_node_t *, void *);
 
 /** @brief Singly linked list of integers. */
-typedef struct gsll_list_s {
-    gsll_node_t *head; /**< First node, or `NULL` if empty. */
-    gsll_node_t *tail; /**< Last node, or `NULL` if empty. */
-
-    g_cmp_f cmp;   /**< Compare function. */
-    g_free_f free; /**< Node's data specific free function. */
-
-    size_t size;      /**< Number of nodes in the list. */
-    size_t data_size; /**< Size of data. */
-} gsll_list_t;
+typedef struct gsll_list_s gsll_list_t;
 
 /**
  * @brief Create an empty linked list.
@@ -78,6 +68,18 @@ gsll_list_t *gsll_create(size_t data_size, g_cmp_f cmp, g_free_f free_node);
  * After the function terminates, `ll` is invalid.
  */
 void gsll_free(gsll_list_t *ll);
+
+/**
+ * @brief Return the number of elements in the linked list.
+ *
+ * @param ll Pointer to the linked list.
+ *
+ * @return The size of the linked list.
+ *
+ * @details
+ * The function does not check if `ll == NULL`.
+ */
+size_t gsll_size(const gsll_list_t *ll);
 
 /**
  * @brief Put a node with `data` at the beginning of the list.

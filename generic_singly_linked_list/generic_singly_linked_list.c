@@ -3,6 +3,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct gsll_list_s {
+    gsll_node_t *head; /**< First node, or `NULL` if empty. */
+    gsll_node_t *tail; /**< Last node, or `NULL` if empty. */
+
+    g_cmp_f cmp;   /**< Compare function. */
+    g_free_f free; /**< Node's data specific free function. */
+
+    size_t size;      /**< Number of nodes in the list. */
+    size_t data_size; /**< Size of data. */
+};
+
 gsll_list_t *gsll_create(size_t data_size, g_cmp_f cmp, g_free_f free_node) {
     if (data_size == 0 || cmp == NULL)
         return NULL;
@@ -25,22 +36,21 @@ void gsll_free(gsll_list_t *ll) {
     if (ll == NULL)
         return;
 
-    const int use_std_free = ll->free == NULL;
-    const g_free_f fn = ll->free;
+    const g_free_f free_f = ll->free == NULL ? free : ll->free;
 
     for (gsll_node_t *node = ll->head; node;) {
         gsll_node_t *const next = node->next;
 
-        if (use_std_free)
-            free(node->data);
-        else
-            fn(node->data);
-
+        free_f(node->data);
         free(node);
         node = next;
     }
 
     free(ll);
+}
+
+size_t gsll_size(const gsll_list_t *ll) {
+    return ll->size;
 }
 
 int gsll_push_front(gsll_list_t *ll, const void *data) {
