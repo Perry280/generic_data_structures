@@ -12,7 +12,9 @@
 /**
  * @brief
  * Compare function.
- * Must return `0` if arguments are equal, or non-zero value otherwise.
+ * The function must return an integer less than, equal to, or greater than zero
+ * if the first argument is found, respectively, to be less than, to match, or
+ * be greater than the second argument.
  */
 typedef int (*g_cmp_f)(const void *, const void *);
 
