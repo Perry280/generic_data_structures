@@ -3,7 +3,7 @@
 
 #define G_OK        0  /**< Success. */
 #define G_ENOMEM    -1 /**< Memory allocation failed. */
-#define G_EINVAL    -2 /**< Invalid argument (e.g. a `NULL` pointer). */
+#define G_EINVAL    -2 /**< Invalid argument (e.g. a `nullptr` pointer). */
 #define G_ERANGE    -3 /**< Index out of range. */
 #define G_ENOTFOUND -4 /**< Value not found. */
 #define G_EEMPTY    -5 /**< Operation on an empty struct. */
