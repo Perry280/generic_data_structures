@@ -19,19 +19,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/** @name Return codes
- *  @{
- */
-#define GVEC_OK     G_OK     /**< Success. */
-#define GVEC_ENOMEM G_ENOMEM /**< Memory allocation failed. */
-#define GVEC_EINVAL                                                            \
-    G_EINVAL /**< Invalid argument (e.g. a `nullptr` pointer). */
-#define GVEC_ERANGE    G_ERANGE    /**< Index out of range. */
-#define GVEC_ENOTFOUND G_ENOTFOUND /**< Value not found. */
-#define GVEC_EEMPTY    G_EEMPTY    /**< Operation on an empty vector. */
-#define GVEC_EITER     G_EITER     /**< Iterator has no next element. */
-/** @} */
-
 /**
  * @brief Opaque handle to a generic vector.
  *
@@ -162,7 +149,7 @@ void *gvec_ptr_at(const gvec_t *vec, size_t index);
  *
  * @details
  * The vector must not be empty: on an empty vector `size - 1` underflows and
- * the resulting pointer is invalid. See @ref GVEC_PTR_AT for the remaining
+ * the resulting pointer is invalid. See @ref gvec_ptr_at for the remaining
  * caveats.
  */
 void *gvec_ptr_last(const gvec_t *vec);
@@ -174,9 +161,9 @@ void *gvec_ptr_last(const gvec_t *vec);
  * @param index Zero-based index of the element to replace.
  * @param data Pointer to the new value; `data_size` bytes are copied from it.
  *
- * @retval GVEC_OK The element was replaced.
- * @retval GVEC_EINVAL `vec` or `data` is `nullptr`.
- * @retval GVEC_ERANGE `index` is greater than or equal to the vector size.
+ * @retval G_OK The element was replaced.
+ * @retval G_EINVAL `vec` or `data` is `nullptr`.
+ * @retval G_ERANGE `index` is greater than or equal to the vector size.
  *
  * @details
  * The destructor is called on the previous value.
@@ -190,9 +177,9 @@ int gvec_set(gvec_t *vec, size_t index, const void *data);
  * @param index Zero-based index of the element to read.
  * @param out Destination buffer of at least `data_size` bytes.
  *
- * @retval GVEC_OK The element was copied into `out`.
- * @retval GVEC_EINVAL `vec` or `out` is `nullptr`.
- * @retval GVEC_ERANGE `index` is greater than or equal to the vector size.
+ * @retval G_OK The element was copied into `out`.
+ * @retval G_EINVAL `vec` or `out` is `nullptr`.
+ * @retval G_ERANGE `index` is greater than or equal to the vector size.
  *
  * @details
  * Only a shallow copy is made: if the element contains pointers, the copy
@@ -206,9 +193,9 @@ int gvec_at(const gvec_t *vec, size_t index, void *out);
  * @param vec Vector to append to.
  * @param data Pointer to the value; `data_size` bytes are copied from it.
  *
- * @retval GVEC_OK The element was appended.
- * @retval GVEC_EINVAL `vec` or `data` is `nullptr`.
- * @retval GVEC_ENOMEM
+ * @retval G_OK The element was appended.
+ * @retval G_EINVAL `vec` or `data` is `nullptr`.
+ * @retval G_ENOMEM
  * The storage needed to grow could not be allocated; the
  * vector is left unchanged.
  *
@@ -227,9 +214,9 @@ int gvec_push_back(gvec_t *vec, const void *data);
  * Destination buffer of at least `data_size` bytes that receives
  * the removed element, or `nullptr` to discard it.
  *
- * @retval GVEC_OK The last element was removed.
- * @retval GVEC_EINVAL `vec` is `nullptr`.
- * @retval GVEC_EEMPTY The vector has no elements.
+ * @retval G_OK The last element was removed.
+ * @retval G_EINVAL `vec` is `nullptr`.
+ * @retval G_EEMPTY The vector has no elements.
  *
  * @details
  * If `out` is not `nullptr` the element is copied into it and ownership passes
@@ -246,11 +233,11 @@ int gvec_pop_back(gvec_t *vec, void *out);
  * @param new_capacity
  * Minimum capacity required, in elements. Must be greater than `0`.
  *
- * @retval GVEC_OK
+ * @retval G_OK
  * The capacity is now at least `new_capacity` (including
  * the case where no change was needed).
- * @retval GVEC_EINVAL `vec` is `nullptr` or `new_capacity` is 0.
- * @retval GVEC_ENOMEM
+ * @retval G_EINVAL `vec` is `nullptr` or `new_capacity` is 0.
+ * @retval G_ENOMEM
  * The storage could not be allocated; the vector is left unchanged.
  *
  * @details
@@ -265,11 +252,11 @@ int gvec_reserve(gvec_t *vec, size_t new_capacity);
  *
  * @param vec Vector to shrink.
  *
- * @retval GVEC_OK
+ * @retval G_OK
  * The capacity now equals the size (including the case
  * where no change was needed).
- * @retval GVEC_EINVAL `vec` is `nullptr`.
- * @retval GVEC_ENOMEM
+ * @retval G_EINVAL `vec` is `nullptr`.
+ * @retval G_ENOMEM
  * The storage could not be reallocated;
  * the vector is left unchanged and remains valid.
  *
@@ -330,9 +317,9 @@ int gvec_iter_has_next(const gvec_iter_t *iter);
  * @param iter Iterator to advance.
  * @param out  Destination buffer of at least `data_size` bytes.
  *
- * @retval GVEC_OK The element was copied into `out` and the iterator advanced.
- * @retval GVEC_EINVAL `iter` or `out` is `nullptr`.
- * @retval GVEC_EITER The iterator has no more elements.
+ * @retval G_OK The element was copied into `out` and the iterator advanced.
+ * @retval G_EINVAL `iter` or `out` is `nullptr`.
+ * @retval G_EITER The iterator has no more elements.
  *
  * @details
  * As with @ref gvec_at, only a shallow copy is made.

@@ -5,12 +5,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define GHM_OK        G_OK     /**< Success. */
-#define GHM_ENOMEM    G_ENOMEM /**< Memory allocation failed. */
-#define GHM_EINVAL    G_EINVAL /**< Invalid argument (e.g. a `NULL` pointer). */
-#define GHM_ENOTFOUND G_ENOTFOUND /**< Value not found. */
-#define GHM_EEMPTY    G_EEMPTY    /**< Operation on an empty struct. */
-
 typedef struct ghm_s ghm_t;
 
 typedef uint64_t (*ghm_hash_f)(const void *);

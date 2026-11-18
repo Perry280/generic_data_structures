@@ -2,6 +2,7 @@
 #include "hash.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define GHM_DEFAULT_SIZE ((size_t)0x10)
 #define GHM_MAX_LOAD(n)  (((n) << 1) / 3)
@@ -158,13 +159,13 @@ static int ghm_expand(ghm_t *hm) {
 
     free(old_indices);
     free(old_entries);
-    return GHM_OK;
+    return G_OK;
 
 CLEANUP:
     if (new_entries != nullptr)
         free(new_entries);
 
-    return GHM_ENOMEM;
+    return G_ENOMEM;
 }
 
 static int ghm_append(ghm_t *hm,
@@ -190,7 +191,7 @@ static int ghm_append(ghm_t *hm,
 
     hm->entries[index] = new;
 
-    return GHM_OK;
+    return G_OK;
 
 CLEANUP:
     if (new.key != nullptr) {
@@ -199,24 +200,24 @@ CLEANUP:
         else
             hm->key_free(new.key);
     }
-    return GHM_ENOMEM;
+    return G_ENOMEM;
 }
 
 // TODO: check for duplicate keys on insert
 int ghm_insert(ghm_t *hm, const void *key, const void *elem) {
     if (hm == nullptr || key == nullptr || elem == nullptr)
-        return GHM_EINVAL;
+        return G_EINVAL;
 
     if (GHM_OVERLOADED(hm)) {
-        if (ghm_expand(hm) == GHM_ENOMEM)
-            return GHM_ENOMEM;
+        if (ghm_expand(hm) == G_ENOMEM)
+            return G_ENOMEM;
     }
 
     const uint64_t hash = hm->key_hash != nullptr ? hm->key_hash(key)
                                                   : fnv1a(key, hm->key_size);
 
-    if (ghm_append(hm, key, elem, hash, ghm_get_index(hm, hash)) == GHM_ENOMEM)
-        return GHM_ENOMEM;
+    if (ghm_append(hm, key, elem, hash, ghm_get_index(hm, hash)) == G_ENOMEM)
+        return G_ENOMEM;
 
-    return GHM_OK;
+    return G_OK;
 }

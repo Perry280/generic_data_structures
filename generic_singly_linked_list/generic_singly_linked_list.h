@@ -10,17 +10,6 @@
 #include "../generic_types.h"
 #include <stddef.h>
 
-/** @name Return codes
- *  @{ */
-#define GSLL_OK     G_OK     /**< Success. */
-#define GSLL_ENOMEM G_ENOMEM /**< Memory allocation failed. */
-#define GSLL_EINVAL                                                            \
-    G_EINVAL /**< Invalid argument (e.g. a `nullptr` pointer). */
-#define GSLL_ERANGE    G_ERANGE    /**< Index out of range. */
-#define GSLL_ENOTFOUND G_ENOTFOUND /**< Value not found. */
-#define GSLL_EEMPTY    G_EEMPTY    /**< Operation on an empty list. */
-/** @} */
-
 /** @brief A node of the linked list. */
 typedef struct gsll_node_s {
     struct gsll_node_s *next; /**< Next node, or `nullptr` if last. */
@@ -88,9 +77,9 @@ size_t gsll_size(const gsll_list_t *ll);
  * @param ll Pointer to the linked list.
  * @param data Pointer to data to insert.
  *
- * @retval GSLL_OK Success.
- * @retval GSLL_EINVAL If `ll` or `data` are `nullptr`.
- * @retval GSLL_ENOMEM If `malloc` failed.
+ * @retval G_OK Success.
+ * @retval G_EINVAL If `ll` or `data` are `nullptr`.
+ * @retval G_ENOMEM If `malloc` failed.
  *
  * @details
  * On failure, `ll` is not modified.
@@ -104,9 +93,9 @@ int gsll_push_front(gsll_list_t *ll, const void *data);
  * @param ll Pointer to the linked list.
  * @param data Pointer to data to insert.
  *
- * @retval GSLL_OK Success.
- * @retval GSLL_EINVAL If `ll` or `data` are `nullptr`.
- * @retval GSLL_ENOMEM If `malloc` failed.
+ * @retval G_OK Success.
+ * @retval G_EINVAL If `ll` or `data` are `nullptr`.
+ * @retval G_ENOMEM If `malloc` failed.
  *
  * @details
  * On failure, `ll` is not modified.
@@ -121,9 +110,9 @@ int gsll_push_back(gsll_list_t *ll, const void *data);
  * @param out
  * On success, if not `nullptr`, will contain the content of the removed node.
  *
- * @retval GSLL_OK Success.
- * @retval GSLL_EINVAL If `ll` is `nullptr`.
- * @retval GSLL_EEMPTY If `ll` is an empty list.
+ * @retval G_OK Success.
+ * @retval G_EINVAL If `ll` is `nullptr`.
+ * @retval G_EEMPTY If `ll` is an empty list.
  *
  * @details
  * On failure, `ll` is not modified.
@@ -138,10 +127,10 @@ int gsll_pop_front(gsll_list_t *ll, void *out);
  * @param index Index of the node to look for. It must be in `[0, size - 1]`.
  * @param out On success, contains the data at index `index`.
  *
- * @retval GSLL_OK Success.
- * @retval GSLL_EINVAL If `ll` or `out` are `nullptr`.
- * @retval GSLL_EEMPTY If `ll` is an empty list.
- * @retval GSLL_ERANGE If `index >= size`.
+ * @retval G_OK Success.
+ * @retval G_EINVAL If `ll` or `out` are `nullptr`.
+ * @retval G_EEMPTY If `ll` is an empty list.
+ * @retval G_ERANGE If `index >= size`.
  *
  * @details
  * On failure, `out` is not modified.
@@ -157,10 +146,10 @@ int gsll_get(const gsll_list_t *ll, size_t index, void *out);
  * Position where the new node will be inserted. It must be in `[0, size]`.
  * @param data Pointer to data to insert.
  *
- * @retval GSLL_OK Success.
- * @retval GSLL_EINVAL If `ll` or `data` are `nullptr`.
- * @retval GSLL_ERANGE If `index > size`.
- * @retval GSLL_ENOMEM If `malloc` fails.
+ * @retval G_OK Success.
+ * @retval G_EINVAL If `ll` or `data` are `nullptr`.
+ * @retval G_ERANGE If `index > size`.
+ * @retval G_ENOMEM If `malloc` fails.
  *
  * @details
  * On failure, `ll` is not modified.
@@ -177,9 +166,9 @@ int gsll_insert_at(gsll_list_t *ll, size_t index, const void *data);
  * @param ll Pointer to the linked list.
  * @param index Index of the node to remove. It must be in `[0, size - 1]`.
  *
- * @retval GSLL_OK Success.
- * @retval GSLL_EINVAL If `ll` is `nullptr`.
- * @retval GSLL_ERANGE If `index >= size`.
+ * @retval G_OK Success.
+ * @retval G_EINVAL If `ll` is `nullptr`.
+ * @retval G_ERANGE If `index >= size`.
  *
  * @details
  * On failure, `ll` is not modified.
@@ -195,10 +184,10 @@ int gsll_delete_at(gsll_list_t *ll, size_t index);
  * @param out
  * If not `nullptr`, on success, contains the index of the first match.
  *
- * @retval GSLL_OK Success.
- * @retval GSLL_EINVAL If `ll` or `data` are `nullptr`.
- * @retval GSLL_EEMPTY If `ll` is an empty list.
- * @retval GSLL_ENOTFOUND If `data` is not in the list.
+ * @retval G_OK Success.
+ * @retval G_EINVAL If `ll` or `data` are `nullptr`.
+ * @retval G_EEMPTY If `ll` is an empty list.
+ * @retval G_ENOTFOUND If `data` is not in the list.
  *
  * @details
  * On failure `out` is not modified.
@@ -210,9 +199,9 @@ int gsll_search(const gsll_list_t *ll, const void *data, size_t *out);
  *
  * @param ll Pointer to the linked list.
  *
- * @retval GSLL_OK Success.
- * @retval GSLL_EINVAL If `ll` is `nullptr`.
- * @retval GSLL_EEMPTY If `ll` is an empty list.
+ * @retval G_OK Success.
+ * @retval G_EINVAL If `ll` is `nullptr`.
+ * @retval G_EEMPTY If `ll` is an empty list.
  *
  * @details
  * On failure `ll` is not modified.
@@ -226,8 +215,8 @@ int gsll_reverse(gsll_list_t *ll);
  * @param f Pointer to the function to be applied to each node.
  * @param args Arguments passed to f. Can be `nullptr`.
  *
- * @retval GSLL_EINVAL If `ll` or `f` are `nullptr`.
- * @retval GSLL_EEMPTY If `ll` is an empty list.
+ * @retval G_EINVAL If `ll` or `f` are `nullptr`.
+ * @retval G_EEMPTY If `ll` is an empty list.
  *
  * @details
  * On failure, `ll` is not modified.

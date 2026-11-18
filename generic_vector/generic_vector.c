@@ -104,38 +104,38 @@ void *gvec_ptr_last(const gvec_t *vec) {
 
 int gvec_set(gvec_t *vec, size_t index, const void *data) {
     if (vec == nullptr || data == nullptr)
-        return GVEC_EINVAL;
+        return G_EINVAL;
 
     if (index >= vec->size)
-        return GVEC_ERANGE;
+        return G_ERANGE;
 
     if (vec->free != nullptr)
         vec->free(GVEC_PTR_AT(vec, index));
 
     memcpy(GVEC_PTR_AT(vec, index), data, vec->data_size);
-    return GVEC_OK;
+    return G_OK;
 }
 
 int gvec_at(const gvec_t *vec, size_t index, void *out) {
     if (vec == nullptr || out == nullptr)
-        return GVEC_EINVAL;
+        return G_EINVAL;
 
     if (index >= vec->size)
-        return GVEC_ERANGE;
+        return G_ERANGE;
 
     memcpy(out, GVEC_PTR_AT(vec, index), vec->data_size);
-    return GVEC_OK;
+    return G_OK;
 }
 
 int gvec_push_back(gvec_t *vec, const void *data) {
     if (vec == nullptr || data == nullptr)
-        return GVEC_EINVAL;
+        return G_EINVAL;
 
     if (vec->size == vec->capacity) {
         const size_t vec_cap = vec->capacity;
         const size_t max = GVEC_MAX_CAPACITY(vec->data_size);
         if (vec_cap >= max)
-            return GVEC_ENOMEM;
+            return G_ENOMEM;
 
         const size_t new_capacity = vec->array == nullptr
                                         ? GVEC_DEFAULT_CAPACITY
@@ -143,22 +143,22 @@ int gvec_push_back(gvec_t *vec, const void *data) {
                                                                : vec_cap * 2);
 
         const int rc = gvec_reserve(vec, new_capacity);
-        if (rc != GVEC_OK)
+        if (rc != G_OK)
             return rc;
     }
 
     memcpy(GVEC_PTR_AT(vec, vec->size), data, vec->data_size);
     vec->size++;
 
-    return GVEC_OK;
+    return G_OK;
 }
 
 int gvec_pop_back(gvec_t *vec, void *out) {
     if (vec == nullptr)
-        return GVEC_EINVAL;
+        return G_EINVAL;
 
     if (vec->size == 0)
-        return GVEC_EEMPTY;
+        return G_EEMPTY;
 
     if (out != nullptr)
         memcpy(out, GVEC_PTR_LAST(vec), vec->data_size);
@@ -166,18 +166,18 @@ int gvec_pop_back(gvec_t *vec, void *out) {
         vec->free(GVEC_PTR_LAST(vec));
 
     vec->size--;
-    return GVEC_OK;
+    return G_OK;
 }
 
 int gvec_reserve(gvec_t *vec, size_t new_capacity) {
     if (vec == nullptr || new_capacity == 0)
-        return GVEC_EINVAL;
+        return G_EINVAL;
 
     if (new_capacity <= vec->capacity)
-        return GVEC_OK;
+        return G_OK;
 
     if (new_capacity > GVEC_MAX_CAPACITY(vec->data_size))
-        return GVEC_ENOMEM;
+        return G_ENOMEM;
 
     const size_t mem_size = new_capacity * vec->data_size;
     void *const new_array = vec->array != nullptr
@@ -185,35 +185,35 @@ int gvec_reserve(gvec_t *vec, size_t new_capacity) {
                                 : malloc(mem_size);
 
     if (new_array == nullptr)
-        return GVEC_ENOMEM;
+        return G_ENOMEM;
 
     vec->array = new_array;
     vec->capacity = new_capacity;
-    return GVEC_OK;
+    return G_OK;
 }
 
 int gvec_shrink_to_fit(gvec_t *vec) {
     if (vec == nullptr)
-        return GVEC_EINVAL;
+        return G_EINVAL;
 
     if (vec->size == vec->capacity || vec->array == nullptr)
-        return GVEC_OK;
+        return G_OK;
 
     if (vec->size == 0) {
         free(vec->array);
         vec->array = nullptr;
         vec->capacity = 0;
-        return GVEC_OK;
+        return G_OK;
     }
 
     void *const new_array = realloc(vec->array, vec->size * vec->data_size);
 
     if (new_array == nullptr)
-        return GVEC_ENOMEM;
+        return G_ENOMEM;
 
     vec->array = new_array;
     vec->capacity = vec->size;
-    return GVEC_OK;
+    return G_OK;
 }
 
 gvec_iter_t *gvec_iter_create(const gvec_t *vec) {
@@ -246,13 +246,13 @@ int gvec_iter_has_next(const gvec_iter_t *iter) {
 
 int gvec_iter_next(gvec_iter_t *iter, void *out) {
     if (iter == nullptr || out == nullptr)
-        return GVEC_EINVAL;
+        return G_EINVAL;
 
     if (iter->index >= iter->vec->size)
-        return GVEC_EITER;
+        return G_EITER;
 
     memcpy(out, GVEC_PTR_AT(iter->vec, iter->index), iter->vec->data_size);
     iter->index++;
 
-    return GVEC_OK;
+    return G_OK;
 }

@@ -8,6 +8,7 @@
 #define G_ENOTFOUND -4 /**< Value not found. */
 #define G_EEMPTY    -5 /**< Operation on an empty struct. */
 #define G_EITER     -6 /**< Iterator has no next element. */
+#define G_EDUP -7 /**< Attempting to insert a duplicate element in struct. */
 
 /**
  * @brief
