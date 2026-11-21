@@ -5,5 +5,6 @@
 #include <stdint.h>
 
 uint64_t fnv1a(const void *data, size_t size);
+uint64_t hash_string(const char *data);
 
 #endif

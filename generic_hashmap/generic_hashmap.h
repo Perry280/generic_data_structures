@@ -7,14 +7,10 @@
 
 typedef struct ghm_s ghm_t;
 
-typedef uint64_t (*ghm_hash_f)(const void *);
-
 ghm_t *ghm_create(size_t key_size,
                   size_t elem_size,
-                  g_cmp_f key_cmp,
-                  ghm_hash_f key_hash,
-                  g_free_f key_free,
-                  g_free_f elem_free);
+                  g_fun_t key_fun,
+                  g_fun_t elem_fun);
 
 void ghm_free(ghm_t *hm);
 

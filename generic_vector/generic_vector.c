@@ -6,10 +6,9 @@
 #define GVEC_MAX_CAPACITY(data_size) ((size_t)PTRDIFF_MAX / (data_size))
 
 struct gvec_s {
-    void *array;
+    g_fun_t fun;
 
-    g_cmp_f cmp;
-    g_free_f free;
+    void *array;
 
     size_t data_size;
     size_t size;
@@ -25,18 +24,12 @@ struct gvec_iter_s {
     ((void *)(((uint8_t *)((vec)->array)) + ((index) * (vec)->data_size)))
 #define GVEC_PTR_LAST(vec) GVEC_PTR_AT(vec, (vec)->size - 1)
 
-gvec_t *gvec_create(size_t data_size, g_cmp_f cmp, g_free_f free_array) {
-    return gvec_create_capacity(data_size,
-                                cmp,
-                                free_array,
-                                GVEC_DEFAULT_CAPACITY);
+gvec_t *gvec_create(size_t data_size, g_fun_t fun) {
+    return gvec_create_capacity(data_size, fun, GVEC_DEFAULT_CAPACITY);
 }
 
-gvec_t *gvec_create_capacity(size_t data_size,
-                             g_cmp_f cmp,
-                             g_free_f free_array,
-                             size_t capacity) {
-    if (data_size == 0 || cmp == nullptr
+gvec_t *gvec_create_capacity(size_t data_size, g_fun_t fun, size_t capacity) {
+    if (data_size == 0 || fun.cmp == nullptr
         || capacity > GVEC_MAX_CAPACITY(data_size))
         return nullptr;
 
@@ -55,8 +48,7 @@ gvec_t *gvec_create_capacity(size_t data_size,
 
     vec->size = 0;
     vec->data_size = data_size;
-    vec->cmp = cmp;
-    vec->free = free_array;
+    vec->fun = fun;
     vec->capacity = capacity;
 
     return vec;
@@ -66,11 +58,12 @@ static void gvec_free_array(gvec_t *vec) {
     if (vec->array == nullptr)
         return;
 
-    if (vec->free != nullptr) {
-        const g_free_f fn = vec->free;
+    if (vec->fun.free != nullptr) {
+        const g_free_f free_data = vec->fun.free;
         for (size_t i = 0; i < vec->size; i++)
-            fn(GVEC_PTR_AT(vec, i));
+            free_data(GVEC_PTR_AT(vec, i));
     }
+
     free(vec->array);
 }
 
@@ -109,8 +102,8 @@ int gvec_set(gvec_t *vec, size_t index, const void *data) {
     if (index >= vec->size)
         return G_ERANGE;
 
-    if (vec->free != nullptr)
-        vec->free(GVEC_PTR_AT(vec, index));
+    if (vec->fun.free != nullptr)
+        vec->fun.free(GVEC_PTR_AT(vec, index));
 
     memcpy(GVEC_PTR_AT(vec, index), data, vec->data_size);
     return G_OK;
@@ -162,8 +155,8 @@ int gvec_pop_back(gvec_t *vec, void *out) {
 
     if (out != nullptr)
         memcpy(out, GVEC_PTR_LAST(vec), vec->data_size);
-    else if (vec->free != nullptr)
-        vec->free(GVEC_PTR_LAST(vec));
+    else if (vec->fun.free != nullptr)
+        vec->fun.free(GVEC_PTR_LAST(vec));
 
     vec->size--;
     return G_OK;

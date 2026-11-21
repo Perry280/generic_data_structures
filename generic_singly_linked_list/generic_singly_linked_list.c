@@ -7,27 +7,26 @@ struct gsll_list_s {
     gsll_node_t *head; /**< First node, or `nullptr` if empty. */
     gsll_node_t *tail; /**< Last node, or `nullptr` if empty. */
 
-    g_cmp_f cmp;   /**< Compare function. */
-    g_free_f free; /**< Node's data specific free function. */
+    g_fun_t fun; /**< Data type specific functions. */
 
     size_t size;      /**< Number of nodes in the list. */
     size_t data_size; /**< Size of data. */
 };
 
-gsll_list_t *gsll_create(size_t data_size, g_cmp_f cmp, g_free_f free_node) {
-    if (data_size == 0 || cmp == nullptr)
+gsll_list_t *gsll_create(size_t data_size, g_fun_t fun) {
+    if (data_size == 0 || fun.cmp == nullptr)
         return nullptr;
 
     gsll_list_t *const ll = malloc(sizeof(gsll_list_t));
     if (ll == nullptr)
         return nullptr;
+
     ll->head = nullptr;
     ll->tail = nullptr;
     ll->size = 0;
 
     ll->data_size = data_size;
-    ll->cmp = cmp;
-    ll->free = free_node;
+    ll->fun = fun;
 
     return ll;
 }
@@ -36,12 +35,14 @@ void gsll_free(gsll_list_t *ll) {
     if (ll == nullptr)
         return;
 
-    const g_free_f free_f = ll->free == nullptr ? free : ll->free;
+    const g_free_f free_data = ll->fun.free;
 
     for (gsll_node_t *node = ll->head; node;) {
         gsll_node_t *const next = node->next;
 
-        free_f(node->data);
+        if (free_data != nullptr)
+            free_data(node->data);
+
         free(node);
         node = next;
     }
@@ -53,16 +54,17 @@ size_t gsll_size(const gsll_list_t *ll) {
     return ll->size;
 }
 
+static inline gsll_node_t *gsll_alloc_node(const gsll_list_t *ll) {
+    return malloc(sizeof(gsll_node_t) + ll->data_size);
+}
+
 int gsll_push_front(gsll_list_t *ll, const void *data) {
     if (ll == nullptr || data == nullptr)
         return G_EINVAL;
 
-    gsll_node_t *const node = malloc(sizeof(gsll_node_t));
+    gsll_node_t *const node = gsll_alloc_node(ll);
     if (node == nullptr)
-        goto CLEANUP;
-    node->data = malloc(ll->data_size);
-    if (node->data == nullptr)
-        goto CLEANUP;
+        return G_ENOMEM;
 
     node->next = ll->head;
     memcpy(node->data, data, ll->data_size);
@@ -72,23 +74,15 @@ int gsll_push_front(gsll_list_t *ll, const void *data) {
         ll->tail = node;
 
     return G_OK;
-
-CLEANUP:
-    if (node != nullptr)
-        free(node);
-    return G_ENOMEM;
 }
 
 int gsll_push_back(gsll_list_t *ll, const void *data) {
     if (ll == nullptr || data == nullptr)
         return G_EINVAL;
 
-    gsll_node_t *const node = malloc(sizeof(gsll_node_t));
+    gsll_node_t *const node = gsll_alloc_node(ll);
     if (node == nullptr)
-        goto CLEANUP;
-    node->data = malloc(ll->data_size);
-    if (node->data == nullptr)
-        goto CLEANUP;
+        return G_ENOMEM;
 
     node->next = nullptr;
     memcpy(node->data, data, ll->data_size);
@@ -101,11 +95,6 @@ int gsll_push_back(gsll_list_t *ll, const void *data) {
     ll->tail = node;
 
     return G_OK;
-
-CLEANUP:
-    if (node != nullptr)
-        free(node);
-    return G_ENOMEM;
 }
 
 int gsll_pop_front(gsll_list_t *ll, void *out) {
@@ -117,16 +106,13 @@ int gsll_pop_front(gsll_list_t *ll, void *out) {
     gsll_node_t *const node = ll->head;
     ll->head = node->next;
 
-    if (--ll->size < 2)
+    if ((--(ll->size)) < 2)
         ll->tail = ll->head;
 
-    if (out != nullptr) {
+    if (out != nullptr)
         memcpy(out, node->data, ll->data_size);
-        free(node->data);
-    } else if (ll->free != nullptr)
-        ll->free(node->data);
-    else
-        free(node->data);
+    else if (ll->fun.free != nullptr)
+        ll->fun.free(node->data);
 
     free(node);
 
@@ -165,12 +151,9 @@ int gsll_insert_at(gsll_list_t *ll, size_t index, const void *data) {
     if (index == ll->size)
         return gsll_push_back(ll, data);
 
-    gsll_node_t *const node = malloc(sizeof(gsll_node_t));
+    gsll_node_t *const node = gsll_alloc_node(ll);
     if (node == nullptr)
-        goto CLEANUP;
-    node->data = malloc(ll->data_size);
-    if (node->data == nullptr)
-        goto CLEANUP;
+        return G_ENOMEM;
 
     gsll_node_t *aux = ll->head;
     for (size_t i = 0; i < index - 1; i++)
@@ -182,11 +165,6 @@ int gsll_insert_at(gsll_list_t *ll, size_t index, const void *data) {
     ll->size++;
 
     return G_OK;
-
-CLEANUP:
-    if (node != nullptr)
-        free(node);
-    return G_ENOMEM;
 }
 
 int gsll_delete_at(gsll_list_t *ll, size_t index) {
@@ -205,13 +183,12 @@ int gsll_delete_at(gsll_list_t *ll, size_t index) {
     gsll_node_t *const node = aux->next;
     aux->next = node->next;
 
-    if (--ll->size == index)
+    if ((--(ll->size)) == index)
         ll->tail = aux;
 
-    if (ll->free == nullptr)
-        free(node->data);
-    else
-        ll->free(node->data);
+    if (ll->fun.free != nullptr)
+        ll->fun.free(node->data);
+
     free(node);
 
     return G_OK;
@@ -223,7 +200,7 @@ int gsll_search(const gsll_list_t *ll, const void *data, size_t *out) {
     if (ll->size == 0)
         return G_EEMPTY;
 
-    const g_cmp_f cmp = ll->cmp;
+    const g_cmp_f cmp = ll->fun.cmp;
     const gsll_node_t *node = ll->head;
     for (size_t i = 0; node; node = node->next, i++) {
         if (cmp(node->data, data) == 0) {

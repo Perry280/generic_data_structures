@@ -1,6 +1,6 @@
 /**
- * @headerfile singly_linked_list_int.h
- * @brief Singly linked list of `int`.
+ * @headerfile generic_singly_linked_list.h
+ * @brief Generic singly linked list.
  *
  * The library is not thread-safe.
  */
@@ -13,7 +13,7 @@
 /** @brief A node of the linked list. */
 typedef struct gsll_node_s {
     struct gsll_node_s *next; /**< Next node, or `nullptr` if last. */
-    void *data;               /**< Pointer to value stored in the node. */
+    alignas(max_align_t) uint8_t data[]; /**< Value stored in the node. */
 } gsll_node_t;
 
 /**
@@ -23,7 +23,7 @@ typedef struct gsll_node_s {
  */
 typedef void (*gsll_foreach_f)(gsll_node_t *, void *);
 
-/** @brief Singly linked list of integers. */
+/** @brief Generic singly linked list. */
 typedef struct gsll_list_s gsll_list_t;
 
 /**
@@ -33,20 +33,20 @@ typedef struct gsll_list_s gsll_list_t;
  * Size of the data stored in each node of the list.
  * It must be a positive integer.
  *
- * @param cmp Compare function. It must not be `nullptr`.
- *
- * @param free_node Data specific free function. It is called in `gsll_free`.
+ * @param fun
+ * Struct of pointers to function:
+ * - cmp: compare two elements. Must not be `nullptr`.
+ * - free: data specific free function. Can be `nullptr`.
+ * - hash: unused.
  *
  * @return The pointer to the newly created list,
- * or `nullptr` if `malloc` failed or `data_size == 0` of `cmp == nullptr`.
+ * or `nullptr` if `malloc` failed or `data_size == 0` of `fun.cmp == nullptr`.
  *
  * @details
  * The caller owns the returned list
  * and must release it with `gsll_free` when done.
- * If `free_node == nullptr`, `free` field of the list is set to `nullptr`,
- * and `free` function of `stdlib.h` is used to free data.
  */
-gsll_list_t *gsll_create(size_t data_size, g_cmp_f cmp, g_free_f free_node);
+gsll_list_t *gsll_create(size_t data_size, g_fun_t fun);
 
 /**
  * @brief Free a linked list and its content.

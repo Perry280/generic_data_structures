@@ -17,7 +17,6 @@
 
 #include "../generic_types.h"
 #include <stddef.h>
-#include <stdint.h>
 
 /**
  * @brief Opaque handle to a generic vector.
@@ -41,9 +40,11 @@ typedef struct gvec_iter_s gvec_iter_t;
  *
  * @param data_size Size in bytes of each element. Must be greater than 0.
  * @param cmp Comparison function for elements. Must not be `nullptr`.
- * @param free_array
- * Destructor called on each element when it is discarded.
- * May be `nullptr` if elements need no cleanup.
+ * @param fun
+ * Struct of pointers to function:
+ * - cmp: compare two elements. Must not be `nullptr`.
+ * - free: data specific free function. Can be `nullptr`.
+ * - hash: unused.
  *
  * @return
  * Pointer to the new vector, or `nullptr` if `data_size` is 0, `cmp` is
@@ -53,7 +54,7 @@ typedef struct gvec_iter_s gvec_iter_t;
  * Equivalent to calling @ref gvec_create_capacity with a capacity of 128
  * elements. The returned vector must be released with @ref gvec_free.
  */
-gvec_t *gvec_create(size_t data_size, g_cmp_f cmp, g_free_f free_array);
+gvec_t *gvec_create(size_t data_size, g_fun_t fun);
 
 /**
  * @brief Creates an empty vector with a given initial capacity.
@@ -75,10 +76,7 @@ gvec_t *gvec_create(size_t data_size, g_cmp_f cmp, g_free_f free_array);
  * which point the default capacity (128 elements) is used.
  * The returned vector must be released with @ref gvec_free.
  */
-gvec_t *gvec_create_capacity(size_t data_size,
-                             g_cmp_f cmp,
-                             g_free_f free_array,
-                             size_t capacity);
+gvec_t *gvec_create_capacity(size_t data_size, g_fun_t fun, size_t capacity);
 
 /**
  * @brief Destroys a vector and releases all its memory.

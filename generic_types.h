@@ -1,6 +1,8 @@
 #ifndef GENERIC_TYPES_H
 #define GENERIC_TYPES_H
 
+#include <stdint.h>
+
 #define G_OK        0  /**< Success. */
 #define G_ENOMEM    -1 /**< Memory allocation failed. */
 #define G_EINVAL    -2 /**< Invalid argument (e.g. a `nullptr` pointer). */
@@ -25,5 +27,18 @@ typedef int (*g_cmp_f)(const void *, const void *);
  * Function that can be used to free the data field in a struct.
  */
 typedef void (*g_free_f)(void *);
+
+typedef uint64_t (*g_hash_f)(const void *);
+
+/**
+ * @brief
+ * Struct of pointers to function for compare, free and hash to manage
+ * data in the generic data structures.
+ */
+typedef struct g_fun_s {
+    g_cmp_f cmp;
+    g_free_f free;
+    g_hash_f hash;
+} g_fun_t;
 
 #endif
