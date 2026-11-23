@@ -9,8 +9,8 @@ typedef struct ghm_s ghm_t;
 
 ghm_t *ghm_create(size_t key_size,
                   size_t elem_size,
-                  g_fun_t key_fun,
-                  g_fun_t elem_fun);
+                  g_functions_t key_fn,
+                  g_functions_t elem_fn);
 
 void ghm_free(ghm_t *hm);
 
