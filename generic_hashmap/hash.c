@@ -16,6 +16,7 @@ uint64_t fnv1a(const void *data, size_t size) {
     return hash;
 }
 
-uint64_t hash_string(const char *data) {
-    return fnv1a(data, strlen(data));
+uint64_t hash_string(const char **data) {
+    const char *string = *data;
+    return fnv1a(string, strlen(string));
 }
