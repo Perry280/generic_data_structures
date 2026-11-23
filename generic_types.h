@@ -35,10 +35,10 @@ typedef uint64_t (*g_hash_f)(const void *);
  * Struct of pointers to function for compare, free and hash to manage
  * data in the generic data structures.
  */
-typedef struct g_fun_s {
+typedef struct g_functions_s {
     g_cmp_f cmp;
     g_free_f free;
     g_hash_f hash;
-} g_fun_t;
+} g_functions_t;
 
 #endif

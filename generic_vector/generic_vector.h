@@ -40,7 +40,7 @@ typedef struct gvec_iter_s gvec_iter_t;
  *
  * @param data_size Size in bytes of each element. Must be greater than 0.
  * @param cmp Comparison function for elements. Must not be `nullptr`.
- * @param fun
+ * @param fn
  * Struct of pointers to function:
  * - cmp: compare two elements. Must not be `nullptr`.
  * - free: data specific free function. Can be `nullptr`.
@@ -54,13 +54,17 @@ typedef struct gvec_iter_s gvec_iter_t;
  * Equivalent to calling @ref gvec_create_capacity with a capacity of 128
  * elements. The returned vector must be released with @ref gvec_free.
  */
-gvec_t *gvec_create(size_t data_size, g_fun_t fun);
+gvec_t *gvec_create(size_t data_size, g_functions_t fn);
 
 /**
  * @brief Creates an empty vector with a given initial capacity.
  *
  * @param data_size Size in bytes of each element. Must be greater than 0.
- * @param cmp Comparison function for elements. Must not be `nullptr`.
+ * @param fn
+ * Struct of pointers to function:
+ * - cmp: compare two elements. Must not be `nullptr`.
+ * - free: data specific free function. Can be `nullptr`.
+ * - hash: unused.
  * @param free_array
  * Destructor called on each element when it is discarded.
  * be `nullptr` if elements need no cleanup.
@@ -76,7 +80,9 @@ gvec_t *gvec_create(size_t data_size, g_fun_t fun);
  * which point the default capacity (128 elements) is used.
  * The returned vector must be released with @ref gvec_free.
  */
-gvec_t *gvec_create_capacity(size_t data_size, g_fun_t fun, size_t capacity);
+gvec_t *gvec_create_capacity(size_t data_size,
+                             g_functions_t fun,
+                             size_t capacity);
 
 /**
  * @brief Destroys a vector and releases all its memory.
@@ -136,7 +142,7 @@ size_t gvec_capacity(const gvec_t *vec);
  * No bounds checking is performed and the arguments may be evaluated more
  * than once, so they must not have side effects.
  */
-void *gvec_ptr_at(const gvec_t *vec, size_t index);
+const void *gvec_ptr_at(const gvec_t *vec, size_t index);
 
 /**
  * @brief Gets a pointer to the last element of the vector.
@@ -150,7 +156,7 @@ void *gvec_ptr_at(const gvec_t *vec, size_t index);
  * the resulting pointer is invalid. See @ref gvec_ptr_at for the remaining
  * caveats.
  */
-void *gvec_ptr_last(const gvec_t *vec);
+const void *gvec_ptr_last(const gvec_t *vec);
 
 /**
  * @brief Overwrites the element at a given index with a copy of `data`.
