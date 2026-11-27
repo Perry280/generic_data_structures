@@ -3,7 +3,6 @@
 
 #include "../generic_types.h"
 #include <stddef.h>
-#include <stdint.h>
 
 typedef struct ghm_s ghm_t;
 

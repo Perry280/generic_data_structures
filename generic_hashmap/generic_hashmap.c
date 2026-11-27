@@ -1,7 +1,5 @@
 #include "generic_hashmap.h"
 #include "hash.h"
-#include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
