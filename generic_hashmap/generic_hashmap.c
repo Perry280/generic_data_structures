@@ -92,7 +92,8 @@ ghm_t *ghm_create(size_t key_size,
                   g_functions_t key_fn,
                   g_functions_t value_fn) {
     if (key_size == 0 || value_size == 0 || key_fn.cmp == nullptr
-        || (key_fn.free != nullptr && key_size != sizeof(void *))
+        || (key_fn.free != nullptr
+            && (key_fn.hash == nullptr || key_size != sizeof(void *)))
         || (value_fn.free != nullptr && value_size != sizeof(void *)))
         return nullptr;
 
@@ -342,7 +343,7 @@ int ghm_insert(ghm_t *hm, const void *key, const void *value) {
     } else
         ghm_set(hm, value, res.index);
 
-    return G_OK;
+    return res.ret_code;
 }
 
 int ghm_delete(ghm_t *hm, const void *key) {
@@ -358,11 +359,12 @@ int ghm_delete(ghm_t *hm, const void *key) {
 
     ghm_entry_t *const del = GHM_ENTRY_PTR_FROM_INDEX(hm, res.index);
 
-    if (hm->key_fn.free != nullptr)
-        hm->key_fn.free(*(void **)ghm_key(hm, del));
+    if (hm->key_fn.free != nullptr
+        && *((void **)ghm_key(hm, del)) != *((const void **)key))
+        hm->key_fn.free(*((void **)ghm_key(hm, del)));
 
     if (hm->value_fn.free != nullptr)
-        hm->value_fn.free(*(void **)ghm_value(hm, del));
+        hm->value_fn.free(*((void **)ghm_value(hm, del)));
 
     memset(del, 0, hm->entry_size);
     del->deleted = true;
