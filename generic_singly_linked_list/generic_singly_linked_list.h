@@ -158,7 +158,7 @@ int gsll_get(const gsll_list_t *ll, size_t index, void *out);
  * and is equivalent to `ll_int_push_back(ll, data)`.
  * The value pointed by `data` gets copied to the new node through shallow copy.
  */
-int gsll_insert_at(gsll_list_t *ll, size_t index, const void *data);
+int gsll_insert(gsll_list_t *ll, size_t index, const void *data);
 
 /**
  * @brief Remove a node at index `index`.
@@ -174,7 +174,7 @@ int gsll_insert_at(gsll_list_t *ll, size_t index, const void *data);
  * On failure, `ll` is not modified.
  * If `index == 0` the function is equivalent to `ll_int_pop(ll, nullptr)`.
  */
-int gsll_delete_at(gsll_list_t *ll, size_t index);
+int gsll_delete(gsll_list_t *ll, size_t index);
 
 /**
  * @brief Find the index of the first node containing `data`.

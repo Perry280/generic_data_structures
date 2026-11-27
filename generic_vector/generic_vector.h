@@ -189,7 +189,7 @@ int gvec_set(gvec_t *vec, size_t index, const void *data);
  * Only a shallow copy is made: if the element contains pointers, the copy
  * shares the pointed-to data with the element stored in the vector.
  */
-int gvec_at(const gvec_t *vec, size_t index, void *out);
+int gvec_get(const gvec_t *vec, size_t index, void *out);
 
 /**
  * @brief Appends a copy of `data` to the end of the vector.
@@ -310,10 +310,10 @@ void gvec_iter_free(gvec_iter_t *iter);
  *
  * @param iter Iterator to query.
  *
- * @retval nonzero The next call to @ref gvec_iter_next will yield an element.
- * @retval 0 There are no more elements, or `iter` is `nullptr`.
+ * @retval `true` The next call to @ref gvec_iter_next will yield an element.
+ * @retval `false` There are no more elements, or `iter` is `nullptr`.
  */
-int gvec_iter_has_next(const gvec_iter_t *iter);
+bool gvec_iter_has_next(const gvec_iter_t *iter);
 
 /**
  * @brief Copies the next element into a buffer and advances the iterator.

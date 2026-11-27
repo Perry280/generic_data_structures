@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GVEC_DEFAULT_CAPACITY        ((size_t)128)
-#define GVEC_MAX_CAPACITY(data_size) ((size_t)PTRDIFF_MAX / (data_size))
+#define GVEC_DEFAULT_CAPACITY ((size_t)128)
+#define GVEC_MAX_CAPACITY(data_size)                                           \
+    ((size_t)(((size_t)PTRDIFF_MAX) / (data_size)))
 
 struct gvec_s {
     g_functions_t fn;
@@ -36,14 +37,12 @@ gvec_t *gvec_create_capacity(size_t data_size,
 
     gvec_t *const vec = malloc(sizeof(gvec_t));
     if (vec == nullptr)
-        return nullptr;
+        goto CLEANUP;
 
     if (capacity > 0) {
         vec->array = malloc(capacity * data_size);
-        if (vec->array == nullptr) {
-            free(vec);
-            return nullptr;
-        }
+        if (vec->array == nullptr)
+            goto CLEANUP;
     } else
         vec->array = nullptr;
 
@@ -53,12 +52,14 @@ gvec_t *gvec_create_capacity(size_t data_size,
     vec->capacity = capacity;
 
     return vec;
+
+CLEANUP:
+    if (vec != nullptr)
+        free(vec);
+    return nullptr;
 }
 
 static void gvec_free_array(gvec_t *vec) {
-    if (vec->array == nullptr)
-        return;
-
     if (vec->fn.free != nullptr) {
         const g_free_f free_data = vec->fn.free;
         for (size_t i = 0; i < vec->size; i++)
@@ -72,7 +73,8 @@ void gvec_free(gvec_t *vec) {
     if (vec == nullptr)
         return;
 
-    gvec_free_array(vec);
+    if (vec->array != nullptr)
+        gvec_free_array(vec);
     free(vec);
 }
 
@@ -110,7 +112,7 @@ int gvec_set(gvec_t *vec, size_t index, const void *data) {
     return G_OK;
 }
 
-int gvec_at(const gvec_t *vec, size_t index, void *out) {
+int gvec_get(const gvec_t *vec, size_t index, void *out) {
     if (vec == nullptr || out == nullptr)
         return G_EINVAL;
 
@@ -194,7 +196,7 @@ int gvec_shrink_to_fit(gvec_t *vec) {
         return G_OK;
 
     if (vec->size == 0) {
-        free(vec->array);
+        gvec_free_array(vec);
         vec->array = nullptr;
         vec->capacity = 0;
         return G_OK;
@@ -231,9 +233,9 @@ void gvec_iter_free(gvec_iter_t *iter) {
     free(iter);
 }
 
-int gvec_iter_has_next(const gvec_iter_t *iter) {
+bool gvec_iter_has_next(const gvec_iter_t *iter) {
     if (iter == nullptr)
-        return 0;
+        return false;
 
     return iter->index < iter->vec->size;
 }

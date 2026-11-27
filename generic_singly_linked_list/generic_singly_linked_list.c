@@ -140,7 +140,7 @@ int gsll_get(const gsll_list_t *ll, size_t index, void *out) {
     return G_OK;
 }
 
-int gsll_insert_at(gsll_list_t *ll, size_t index, const void *data) {
+int gsll_insert(gsll_list_t *ll, size_t index, const void *data) {
     if (ll == nullptr || data == nullptr)
         return G_EINVAL;
     if (index > ll->size)
@@ -167,7 +167,7 @@ int gsll_insert_at(gsll_list_t *ll, size_t index, const void *data) {
     return G_OK;
 }
 
-int gsll_delete_at(gsll_list_t *ll, size_t index) {
+int gsll_delete(gsll_list_t *ll, size_t index) {
     if (ll == nullptr)
         return G_EINVAL;
     if (index >= ll->size)

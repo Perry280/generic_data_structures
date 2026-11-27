@@ -3,14 +3,14 @@
 
 #include <stdint.h>
 
-#define G_OK        0  /**< Success. */
-#define G_ENOMEM    -1 /**< Memory allocation failed. */
-#define G_EINVAL    -2 /**< Invalid argument (e.g. a `nullptr` pointer). */
-#define G_ERANGE    -3 /**< Index out of range. */
-#define G_ENOTFOUND -4 /**< Value not found. */
-#define G_EEMPTY    -5 /**< Operation on an empty struct. */
-#define G_EITER     -6 /**< Iterator has no next element. */
-#define G_EDUP -7 /**< Attempting to insert a duplicate element in struct. */
+#define G_OK        (0)  /**< Success. */
+#define G_ENOMEM    (-1) /**< Memory allocation failed. */
+#define G_EINVAL    (-2) /**< Invalid argument (e.g. a `nullptr` pointer). */
+#define G_ERANGE    (-3) /**< Index out of range. */
+#define G_ENOTFOUND (-4) /**< Value not found. */
+#define G_EEMPTY    (-5) /**< Operation on an empty struct. */
+#define G_EITER     (-6) /**< Iterator has no next element. */
+#define G_EDUP      (-7) /**< Inserting a duplicate element in struct. */
 
 /**
  * @brief
@@ -28,6 +28,11 @@ typedef int (*g_cmp_f)(const void *, const void *);
  */
 typedef void (*g_free_f)(void *);
 
+/**
+ * @brief
+ * Hash function.
+ * The argument is a pointer to the data stored in the data structure.
+ */
 typedef uint64_t (*g_hash_f)(const void *);
 
 /**
