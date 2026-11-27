@@ -93,7 +93,9 @@ ghm_t *ghm_create(size_t key_size,
                   size_t value_size,
                   g_functions_t key_fn,
                   g_functions_t value_fn) {
-    if (key_size == 0 || value_size == 0 || key_fn.cmp == nullptr)
+    if (key_size == 0 || value_size == 0 || key_fn.cmp == nullptr
+        || (key_fn.free != nullptr && key_size != sizeof(void *))
+        || (value_fn.free != nullptr && value_size != sizeof(void *)))
         return nullptr;
 
     ghm_t *const hm = malloc(sizeof(ghm_t));
