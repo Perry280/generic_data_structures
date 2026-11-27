@@ -255,7 +255,7 @@ static int ghm_rehash(ghm_t *hm) {
         const ghm_entry_t *const
             old_entry = (ghm_entry_t *)(((uint8_t *)old_entries)
                                         + (i * hm->entry_size));
-        if (old_entries->deleted)
+        if (old_entry->deleted)
             continue;
 
         ghm_entry_t *const new_entry = GHM_ENTRY_PTR(hm, new_nentries);
