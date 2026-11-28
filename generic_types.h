@@ -46,7 +46,4 @@ typedef struct g_functions_s {
     g_hash_f hash;
 } g_functions_t;
 
-int cmp_string(const void *a, const void *b);
-int cmp_int(const void *a, const void *b);
-
 #endif

@@ -86,7 +86,7 @@ typedef struct ghm_s ghm_t;
  * g_functions_t key_fn = {.cmp = cmp_string,
  *                         .free = free,
  *                         .hash = hash_string};
- * g_functions_t value_fn = {0};
+ * g_functions_t value_fn = {};
  *
  * ghm_t *hm = ghm_create(sizeof(char *), sizeof(int), key_fn, value_fn);
  * @endcode

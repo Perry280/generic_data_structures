@@ -187,7 +187,7 @@ static ghm_lookup_result ghm_lookup(const ghm_t *hm,
                                     const void *key,
                                     ghm_lookup_op op) {
     const size_t mask = hm->capacity - 1;
-    ghm_lookup_result res = {0};
+    ghm_lookup_result res = {};
     uint64_t probe = hash;
 
     bool tombstone_found = false;
