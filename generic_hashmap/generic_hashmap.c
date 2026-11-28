@@ -74,7 +74,7 @@ static inline size_t ghm_get_value_offset(size_t key_size, size_t value_size) {
 static inline size_t ghm_get_entry_size(size_t value_size,
                                         size_t value_offset) {
     const size_t size = sizeof(ghm_entry_t) + value_size + value_offset;
-    const size_t alignment = alignof(ghm_entry_t) - 1;
+    constexpr size_t alignment = alignof(ghm_entry_t) - 1;
     return (size + alignment) & ~alignment; // round up
 }
 
