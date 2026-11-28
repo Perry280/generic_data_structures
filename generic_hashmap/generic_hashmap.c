@@ -228,11 +228,10 @@ static ghm_lookup_result ghm_lookup(const ghm_t *hm,
 }
 
 static int ghm_rehash(ghm_t *hm) {
-    const size_t new_capacity = hm->used >= GHM_EXPAND_THRESHOLD(hm->nentries)
-                                    ? hm->capacity * 2
-                                    : hm->capacity;
+    const bool expand_map = hm->used >= GHM_EXPAND_THRESHOLD(hm->nentries);
+    const size_t new_capacity = expand_map ? hm->capacity * 2 : hm->capacity;
 
-    if (new_capacity > GHM_MAX_CAPACITY(hm->entry_size))
+    if (expand_map && new_capacity > GHM_MAX_CAPACITY(hm->entry_size))
         return G_ENOMEM;
 
     ghm_entry_t *const new_entries = calloc(new_capacity, hm->entry_size);
