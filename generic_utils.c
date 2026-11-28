@@ -2,7 +2,9 @@
 #include <string.h>
 
 int cmp_int(const void *a, const void *b) {
-    return *((const int *)a) - *((const int *)b);
+    const int x = *((const int *)a);
+    const int y = *((const int *)b);
+    return (x > y) - (x < y);
 }
 
 int cmp_string(const void *a, const void *b) {
